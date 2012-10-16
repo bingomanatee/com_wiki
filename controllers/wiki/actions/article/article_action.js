@@ -20,7 +20,10 @@ module.exports = {
             if (err) {
                 self.emit('input_error', rs, err);
             } else if (article) {
-                self.on_process(rs, article)
+                self.models.member.can(rs, [ "create article"], function (err, can) {
+                    self.on_process(rs, article, can)
+
+                })
             } else {
                 self.models.member.can(rs, ['edit any scope'], function (err, can) {
                     if (err) {
@@ -52,14 +55,17 @@ module.exports = {
 
     _on_input_error_go:'/',
 
-    on_process:function (rs, article) {
+    on_process:function (rs, article, can_create) {
         var self = this;
-        self.on_output(rs, {article:article, menus:[
-            {
-                name:'wiki',
-                title:'Wiki',
-                items:[]
-            }
-        ]})
+        self.on_output(rs, {
+            article:article,
+            can_create:can_create,
+            menus:[
+                {
+                    name:'wiki',
+                    title:'Wiki',
+                    items:[]
+                }
+            ]})
     }
 }

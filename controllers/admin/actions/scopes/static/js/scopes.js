@@ -28,6 +28,10 @@ function ScopesCtrl($scope, $filter, $compile, Scopes) {
         document.location = '/wiki/se/' + s.scope;
     }
 
+    $scope.export_scope = function (s) {
+        document.location = '/admin/wiki/export/' + s.scope;
+    }
+
     $scope.view_scope = function (s) {
         document.location = '/wiki/s/' + s.scope;
     }

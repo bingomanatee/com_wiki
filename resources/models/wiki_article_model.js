@@ -39,6 +39,7 @@ module.exports = function (mongoose_inject) {
         var full_schema_def = _.extend({
             linked_from:[linked_from_schema_def],
             link_to:[linked_from_schema_def],
+            _id: 'string', // == scope + ':' + name
             name:{type:'string', index:true},
             versions:[arch_schema_def],
             deleted:{type:'boolean', default:false},
@@ -89,8 +90,8 @@ module.exports = function (mongoose_inject) {
                     q.populate('author').populate('creator').exec(cb);
                 },
 
-                article:function (scope, article, cb, full) {
-                    var q = this.find_one({scope:scope, name:article, deleted:false});
+                article:function (scope, name, cb, full) {
+                    var q = this.find_one({scope:scope, name:name, deleted:false});
                     if (full) {
                         q.populate('versions.author');
                     } else {
@@ -109,8 +110,12 @@ module.exports = function (mongoose_inject) {
                     q.sort('name').populate('author').populate('creator').exec(cb);
                 },
 
-                articles_for_scope:function (scope, cb, full) {
-                    var q = this.find({scope_root:false, scope:scope, deleted:false});
+                articles_for_scope:function (scope, cb, full, inc_scope) {
+                    var query = { scope:scope, deleted:false}
+                    if (!inc_scope){
+                        query.scope_root = false;
+                    }
+                    var q = this.find(query);
                     if (full) {
                         q.populate('versions.author');
                     } else {
