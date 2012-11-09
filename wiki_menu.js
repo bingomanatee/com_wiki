@@ -4,9 +4,10 @@ var _ = require('underscore');
 
 var NE = require('nuby-express');
 
+
 module.exports = {
     name:'admin_menu',
-    exec:function (rs, menus, cb) {
+    exec:function (rs, menus, cb, input) {
 
         var self = this;
 
@@ -36,7 +37,7 @@ module.exports = {
 
 
                 rs.action.models.member.can(rs, [
-                    "edit any scope"], function (err, can) {
+                    "edit any scope"], function (err, edit_scope) {
 
                     var wiki_links = [
                         {
@@ -48,9 +49,14 @@ module.exports = {
                             link:'/admin/wiki/articles',
                             type:'link',
                             label:'Articles'
+                        },
+                        {
+                            link:'/admin/wiki/orphan_links',
+                            type:'link',
+                            label:'Orphan Links'
                         }
                     ];
-
+                    
                     if (can_create){
                         wiki_links.push({
                             link: '/admin/wiki/import',
@@ -59,7 +65,8 @@ module.exports = {
                         })
                     }
 
-                    if (can) {
+                    if (edit_scope) {
+
                         self.add_menu_items(menus, 'admin',
                             {
                                 label:'Wiki',
@@ -69,24 +76,7 @@ module.exports = {
                             })
                     }
 
-                    if (menus.article && rs.req_props.article) {
-                        var in_links = _.map(rs.req_props.article.linked_from, function (link) {
-                            return {
-                                type:'link',
-                                label:link.title,
-                                link:'/wiki/a/' + link.scope + '/' + link.name
-                            }
-                        });
-
-                        self.add_menu_items(menus, 'article', {
-                            label:'Links to this article',
-                            items:in_links
-                        });
-                        cb();
-
-                    } else {
-                        cb();
-                    }
+                    cb();
                 })
 
             })
